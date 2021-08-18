@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>havce ctf team</title><link>/</link><description>Recent content on havce ctf team</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 18 Aug 2021 11:34:13 +0200</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><item><title>Hello, World!</title><link>/posts/helloworld/</link><pubDate>Wed, 18 Aug 2021 11:34:13 +0200</pubDate><guid>/posts/helloworld/</guid><description>Hello, World! Finally we have our little corner on the internet. We will post our CTF writeups, rants and our activities.
+If you wanna hang with us, enter our Discord server. If you can find the invite link.
+Follow us on Twitter or on GitHub! If you wanna say hello, shoot us an email at: echo &amp;quot;aW5mb0BoYXZjZS5pdAo=&amp;quot; | base64 -d</description><content>&lt;p>Hello, World! Finally we have our little corner on the internet.
+We will post our CTF writeups, rants and our activities.&lt;/p>
+&lt;p>If you wanna hang with us, enter our Discord server. If you can find &lt;a href="https://ctf.havce.it">the invite link&lt;/a>.&lt;/p>
+&lt;p>Follow us on &lt;a href="https://twitter.com/havce_ctf">Twitter&lt;/a> or on &lt;a href="https://github.com/havce">GitHub&lt;/a>! If you wanna say hello, shoot us an email at: &lt;code>echo &amp;quot;aW5mb0BoYXZjZS5pdAo=&amp;quot; | base64 -d&lt;/code>&lt;/p></content></item><item><title>Who we are</title><link>/about/</link><pubDate>Wed, 18 Aug 2021 11:22:31 +0200</pubDate><guid>/about/</guid><description>We are a group of people who like to break stuff, learn about cybersecurity and enjoy anolinis with Parmigiano Reggiano. We also play CTFs, you can find us on CTFTime. havce was created in 2021, after the 2021 edition of CyberChallenge.IT.
+havce is currently composed by:
+Gianluca Altomani, @devgianlu Manuel Romei, @kriive Giovanni Spadaccini, @giospada Francesco Ciociola, @Kekko01</description><content>&lt;p>We are a group of people who like to break stuff, learn about cybersecurity and enjoy anolinis with Parmigiano Reggiano.
+We also play CTFs, you can find us on &lt;a href="https://ctftime.org/team/162123">CTFTime&lt;/a>. &lt;code>havce&lt;/code> was created in 2021, after the 2021 edition of &lt;a href="https://cyberchallenge.it">CyberChallenge.IT&lt;/a>.&lt;/p>
+&lt;p>&lt;code>havce&lt;/code> is currently composed by:&lt;/p>
+&lt;ul>
+&lt;li>Gianluca Altomani, &lt;a href="https:/github.com/devgianlu">@devgianlu&lt;/a>&lt;/li>
+&lt;li>Manuel Romei, &lt;a href="https:/github.com/kriive">@kriive&lt;/a>&lt;/li>
+&lt;li>Giovanni Spadaccini, &lt;a href="https://github.com/giospada">@giospada&lt;/a>&lt;/li>
+&lt;li>Francesco Ciociola, &lt;a href="https://github.com/Kekko01">@Kekko01&lt;/a>&lt;/li>
+&lt;/ul></content></item></channel></rss>
