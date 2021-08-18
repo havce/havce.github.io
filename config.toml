@@ -9,7 +9,7 @@ paginate = 5
   contentTypeName = "posts"
 
   # ["orange", "blue", "red", "green", "pink"]
-  themeColor = "orange"
+  themeColor = "green"
 
   # if you set this to 0, only submenu trigger will be visible
   showMenuItems = 2
@@ -21,14 +21,14 @@ paginate = 5
   fullWidthTheme = false
 
   # center theme with default width
-  centerTheme = false
+  centerTheme = true
 
   # set a custom favicon (default is a `themeColor` square)
   # favicon = "favicon.ico"
 
   # set post to show the last updated
   # If you use git, you can set `enableGitInfo` to `true` and then post will automatically get the last updated
-  showLastUpdated = false
+  showLastUpdated = true
   # Provide a string as a prefix for the last update date. By default, it looks like this: 2020-xx-xx [Updated: 2020-xx-xx] :: Author
   # updatedDatePrefix = "Updated"
 
@@ -48,9 +48,9 @@ paginate = 5
     languageName = "English"
     title = "havce ctf team"
     subtitle = "unipr's official ctf team"
-    owner = ""
-    keywords = ""
-    copyright = ""
+    owner = "havce"
+    keywords = "ctf, cybersecurity, unipr, hack"
+    copyright = "rot13(havce)"
     menuMore = "Show more"
     readMore = "Read more"
     readOtherPosts = "Read other posts"
