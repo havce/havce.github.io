@@ -10,3 +10,4 @@ We are also the official CTF team of the [University of Parma](https://www.unipr
  * Manuel Romei, [@kriive](https://github.com/kriive)
  * Giovanni Spadaccini, [@giospada](https://github.com/giospada)
  * Francesco Ciociola, [@Kekko01](https://github.com/Kekko01)
+ * Riccardo Versetti, [@verso1](https://github.com/verso1)
