@@ -291,8 +291,119 @@ INTENT{pl4y1n6_1n_7h3_54nd_15_d4n63r0u5}
 
 # Scadomware
 ### Description
+We are provided a sample of a ransomware and an encrypted file. Our task is to decrypt such file.
+
 
 ### Solution
+The executable main function is to enumerate files and encrypt them all. The encryption is done with AES/CBC the IV is fixed in the code and the key is the SHA1 of some string which is the concatenation of:
+
+- A generated static string `YouTakeTheRedPillYouStayInWonderlandAndIShowYouHowDeepTheRabbitHoleGoes`
+- `0mgisthebestg`
+- A number contained in the encrypt file from 10-14 bytes in hex
+- The original file size contained in the encrypted file from 6-10 bytes 
+- `---`
+- The int checksum of the computer physical address (which we don't know)
+
+Be ware that the SHA1 output length isn't enough for the AES key and therefore some of it is initialized with a simple function. The solve script is as follows:
+
+```python
+import hashlib
+
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+from Crypto.Util.number import bytes_to_long
+
+with open('important.intent.enc', 'rb') as f:
+    encrypted_file = f.read()
+    original_size = bytes_to_long(encrypted_file[6:10][::-1])
+    big_num = bytes_to_long(encrypted_file[10:14][::-1])
+    encrypted_file = encrypted_file[14:-4]
+
+
+def decrypt(ip_int):
+    hash_input = '{0:}0mgisthebestg{1:08x}{2:}---{3:}'.format(
+        'YouTakeTheRedPillYouStayInWonderlandAndIShowYouHowDeepTheRabbitHoleGoes', big_num, original_size, ip_int)
+    hash_bytes = hashlib.sha1(hash_input.encode()).digest()
+
+    aes_key = bytearray([0] * 32)
+    for i in range(32):
+        aes_key[i] = (i - 0x5b) % 256
+
+    for i in range(len(hash_bytes)):
+        aes_key[i] = hash_bytes[i]
+
+    cipher = AES.new(bytes(aes_key), AES.MODE_CBC, b'0010000300003007')
+    out = unpad(cipher.decrypt(encrypted_file), 16)
+    print(out.decode())
+
+
+def main():
+    ip_int = 0
+    while True:
+        try:
+            decrypt(ip_int)
+            break
+        except:
+            pass
+
+        ip_int += 1
+
+
+if __name__ == '__main__':
+    main()
+```
+
+To generate the static string I used this C program, mainly copy-pasted from the decompiler:
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+char *  calcPass(char *input1,char *input2)
+{
+  char *pbVar1;
+  char cVar2;
+  uint outLen;
+  char *in2len;
+  char *res;
+  uint index;
+  uint uVar3;
+
+  in2len = input1;
+  do {
+    cVar2 = *in2len;
+    in2len = in2len + 1;
+  } while (cVar2 != '\0');
+  outLen = (int)in2len - (int)(input1 + 1);
+  in2len = input2;
+  do {
+    cVar2 = *in2len;
+    in2len = in2len + 1;
+  } while (cVar2 != '\0');
+  res = (char *)malloc(outLen + 1);
+  index = 0;
+  if (outLen != 0) {
+    do {
+      uVar3 = index % (unsigned int)((int)in2len - (int)(input2 + 1));
+      pbVar1 = (char *)(res + index);
+      index = index + 1;
+      *pbVar1 = input2[uVar3] ^ pbVar1[(int)input1 - (int)res];
+    } while (index < outLen);
+    res[outLen] = '\0';
+    return res;
+  }
+  *res = '\0';
+  return res;
+}
+
+int main() {
+    char* in1 = "h\\FgR\\Tg[VaRUcZ__n^F`GRNx]d\\]STA_R]Sp]Wz`_^Dj\\F\x7f^DwVVGe[VaRUSZG{\\[Tt\\V@";
+    char in2 [] = {0x31, 0x33, 0x33, 0x33, 0x33, 0x37, 0};
+    char* pass = calcPass(in1, (char*)&in2);
+    printf("%s\n", pass);
+}
+```
+
 
 # Electron
 ### Description
