@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>havce ctf team</title><link>/</link><description>Recent content on havce ctf team</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>rot13(havce)</copyright><lastBuildDate>Tue, 16 Nov 2021 21:36:08 +0100</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml"/><item><title>Intent Summit 2021 CTF</title><link>/writeups/intent-summit-2021/</link><pubDate>Tue, 16 Nov 2021 21:36:08 +0100</pubDate><guid>/writeups/intent-summit-2021/</guid><description>Challenge Category Points Door (un)Locked web 100 Careers web 100 GraphiCS web 150 Etulosba web 200 Darknet Club web 200 Flag Vault web 250 Mass Notes web 250 Pattern Institute pwn 450 Scadomware rev 300 Electron bot 50 Door (un)Locked Some researchers started deploying a website for their CTF, but something went wrong with the defined policies when trying to hide the flags.</description><content>&lt;table>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>intent on havce ctf team</title><link>/tags/intent/</link><description>Recent content in intent on havce ctf team</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>rot13(havce)</copyright><lastBuildDate>Tue, 16 Nov 2021 21:36:08 +0100</lastBuildDate><atom:link href="/tags/intent/index.xml" rel="self" type="application/rss+xml"/><item><title>Intent Summit 2021 CTF</title><link>/writeups/intent-summit-2021/</link><pubDate>Tue, 16 Nov 2021 21:36:08 +0100</pubDate><guid>/writeups/intent-summit-2021/</guid><description>Challenge Category Points Door (un)Locked web 100 Careers web 100 GraphiCS web 150 Etulosba web 200 Darknet Club web 200 Flag Vault web 250 Mass Notes web 250 Pattern Institute pwn 450 Scadomware rev 300 Electron bot 50 Door (un)Locked Some researchers started deploying a website for their CTF, but something went wrong with the defined policies when trying to hide the flags.</description><content>&lt;table>
 &lt;thead>
 &lt;tr>
 &lt;th>Challenge&lt;/th>
@@ -398,35 +398,4 @@ resp &lt;span style="color:#f92672">=&lt;/span> requests&lt;span style="color:#f
 &lt;span style="color:#e6db74">&amp;#39;sig&amp;#39;&lt;/span>: sig,
 }, verify&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#66d9ef">False&lt;/span>)
 print(resp&lt;span style="color:#f92672">.&lt;/span>status_code, resp&lt;span style="color:#f92672">.&lt;/span>text)
-&lt;/code>&lt;/pre>&lt;/div></content></item><item><title>kriive</title><link>/members/kriive/</link><pubDate>Tue, 16 Nov 2021 00:06:13 +0100</pubDate><guid>/members/kriive/</guid><description>Hi, Manuel here! I am one of the co-founders of the havce CTF team. I like to solve web and pwn challenges.
-You can find me in the following corners of the internet:
-GitHub Twitter Blog Mastodon</description><content>&lt;p>Hi, Manuel here! I am one of the co-founders of the &lt;code>havce&lt;/code> CTF team. I like to solve web and pwn challenges.&lt;/p>
-&lt;p>You can find me in the following corners of the internet:&lt;/p>
-&lt;ul>
-&lt;li>&lt;a href="https://github.com/kriive">GitHub&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://twitter.com/kriive">Twitter&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://kriive.github.io">Blog&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://fosstodon.org/@kriive">Mastodon&lt;/a>&lt;/li>
-&lt;/ul></content></item><item><title>devgianlu</title><link>/members/devgianlu/</link><pubDate>Mon, 15 Nov 2021 18:51:32 +0100</pubDate><guid>/members/devgianlu/</guid><description>My name is Gianluca, I am co-founder of the havce CTF team and 2021 @cyberteamitaly member. Rev and mobile enthusiast.
-Website Github Twitter</description><content>&lt;p>My name is Gianluca, I am co-founder of the &lt;code>havce&lt;/code> CTF team and 2021 &lt;a href="https://twitter.com/cyberteamitaly">@cyberteamitaly&lt;/a> member. Rev and mobile enthusiast.&lt;/p>
-&lt;ul>
-&lt;li>&lt;a href="https://gianlu.xyz">Website&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://github.com/devgianlu">Github&lt;/a>&lt;/li>
-&lt;li>&lt;a href="https://twitter.com/devgianlu">Twitter&lt;/a>&lt;/li>
-&lt;/ul></content></item><item><title>Hello, World!</title><link>/posts/helloworld/</link><pubDate>Wed, 18 Aug 2021 11:34:13 +0200</pubDate><guid>/posts/helloworld/</guid><description>Hello, World! Finally we have our little corner on the internet. We will post our CTF writeups, rants and our activities.
-If you wanna hang with us, enter our Discord server. If you can find the invite link.
-Follow us on Twitter or on GitHub! If you wanna say hello, shoot us an email at: echo &amp;quot;aW5mb0BoYXZjZS5pdAo=&amp;quot; | base64 -d</description><content>&lt;p>Hello, World! Finally we have our little corner on the internet.
-We will post our CTF writeups, rants and our activities.&lt;/p>
-&lt;p>If you wanna hang with us, enter our Discord server. If you can find &lt;a href="https://ctf.havce.it">the invite link&lt;/a>.&lt;/p>
-&lt;p>Follow us on &lt;a href="https://twitter.com/havce_ctf">Twitter&lt;/a> or on &lt;a href="https://github.com/havce">GitHub&lt;/a>! If you wanna say hello, shoot us an email at: &lt;code>echo &amp;quot;aW5mb0BoYXZjZS5pdAo=&amp;quot; | base64 -d&lt;/code>&lt;/p></content></item><item><title>Who we are</title><link>/about/</link><pubDate>Wed, 18 Aug 2021 11:22:31 +0200</pubDate><guid>/about/</guid><description>We are a group of people who like to break stuff, learn about cybersecurity and enjoy anolinis with Parmigiano Reggiano. We are also the official CTF team of the University of Parma, you can find us on CTFTime. havce was created in 2021, after the 2021 edition of CyberChallenge.IT.
-havce is currently composed by:
-Gianluca Altomani, @devgianlu Manuel Romei, @kriive Giovanni Spadaccini, @giospada Francesco Ciociola, @Kekko01 Riccardo Versetti, @verso1</description><content>&lt;p>We are a group of people who like to break stuff, learn about cybersecurity and enjoy anolinis with Parmigiano Reggiano.
-We are also the official CTF team of the &lt;a href="https://www.unipr.it">University of Parma&lt;/a>, you can find us on &lt;a href="https://ctftime.org/team/162123">CTFTime&lt;/a>. &lt;code>havce&lt;/code> was created in 2021, after the 2021 edition of &lt;a href="https://cyberchallenge.it">CyberChallenge.IT&lt;/a>.&lt;/p>
-&lt;p>&lt;code>havce&lt;/code> is currently composed by:&lt;/p>
-&lt;ul>
-&lt;li>Gianluca Altomani, &lt;a href="/members/devgianlu">@devgianlu&lt;/a>&lt;/li>
-&lt;li>Manuel Romei, &lt;a href="https://github.com/kriive">@kriive&lt;/a>&lt;/li>
-&lt;li>Giovanni Spadaccini, &lt;a href="https://github.com/giospada">@giospada&lt;/a>&lt;/li>
-&lt;li>Francesco Ciociola, &lt;a href="https://github.com/Kekko01">@Kekko01&lt;/a>&lt;/li>
-&lt;li>Riccardo Versetti, &lt;a href="https://github.com/verso1">@verso1&lt;/a>&lt;/li>
-&lt;/ul></content></item></channel></rss>
+&lt;/code>&lt;/pre>&lt;/div></content></item></channel></rss>
